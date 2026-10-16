@@ -39,7 +39,7 @@ async function loadMotions() {
   setStatus(motionsStatus, "Loading motions...");
   const { data: motions, error } = await supabase
     .from("motions")
-    .select("id, title, proposer, supporting_argument, created_at")
+    .select("id, title, proposer, is_anonymous, supporting_argument, created_at")
     .order("created_at", { ascending: false });
 
   if (error) {
@@ -76,7 +76,7 @@ async function loadMotions() {
     return `
       <article class="motion-card">
         <h3>${escapeHtml(item.title)}</h3>
-        <p class="motion-meta">Proposed by ${escapeHtml(item.proposer)} · ${formatDate(item.created_at)}</p>
+        <p class="motion-meta">Proposed by ${item.is_anonymous ? "Anonymous" : escapeHtml(item.proposer)} · ${formatDate(item.created_at)}</p>
         <p class="supporting-argument">${escapeHtml(item.supporting_argument)}</p>
         <div class="reaction-controls" data-motion-id="${item.id}">
           <button class="reaction-button" type="button" data-vote="1" aria-label="Vote for ${escapeHtml(item.title)}">For <span>${count.up}</span></button>
@@ -97,10 +97,16 @@ motionForm.addEventListener("submit", async (event) => {
   try {
     const session = await ensureAnonymousSession();
     const formData = new FormData(motionForm);
+    const isAnonymous = formData.get("anonymous") === "on";
+    const proposer = formData.get("proposer").trim();
+    if (!isAnonymous && !proposer) {
+      throw new Error("Enter your name or choose Submit anonymously.");
+    }
     const { error } = await supabase.from("motions").insert({
       author_id: session.user.id,
       title: formData.get("title").trim(),
-      proposer: formData.get("proposer").trim(),
+      proposer: isAnonymous ? "Anonymous" : proposer,
+      is_anonymous: isAnonymous,
       supporting_argument: formData.get("supporting_argument").trim(),
     });
     if (error) throw error;

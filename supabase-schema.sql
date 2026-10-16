@@ -3,6 +3,7 @@ create table public.motions (
   author_id uuid not null references auth.users(id) on delete cascade,
   title text not null check (char_length(title) between 1 and 120),
   proposer text not null check (char_length(proposer) between 1 and 80),
+  is_anonymous boolean not null default false,
   supporting_argument text not null check (char_length(supporting_argument) between 1 and 3000),
   created_at timestamptz not null default now()
 );

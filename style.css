@@ -96,6 +96,18 @@ label {
   font-weight: bold;
 }
 
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-weight: normal;
+}
+
+.checkbox-label input {
+  width: auto;
+  margin: 0;
+}
+
 label span {
   color: var(--ink-muted);
   font-weight: normal;
