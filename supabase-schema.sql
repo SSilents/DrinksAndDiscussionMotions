@@ -16,8 +16,13 @@ create table public.motion_reactions (
   primary key (motion_id, user_id)
 );
 
+create table public.admin_users (
+  user_id uuid primary key references auth.users(id) on delete cascade
+);
+
 alter table public.motions enable row level security;
 alter table public.motion_reactions enable row level security;
+alter table public.admin_users enable row level security;
 
 create policy "Anyone can read motions"
   on public.motions for select
@@ -44,3 +49,13 @@ create policy "Users can change their own reactions"
   to authenticated
   using (auth.uid() = user_id)
   with check (auth.uid() = user_id);
+
+create policy "Admins can read admin membership"
+  on public.admin_users for select
+  to authenticated
+  using (auth.uid() = user_id);
+
+create policy "Admins can delete motions"
+  on public.motions for delete
+  to authenticated
+  using (exists (select 1 from public.admin_users where user_id = auth.uid()));

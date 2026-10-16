@@ -39,4 +39,13 @@ layout: layouts/base.njk
   <div id="motions-list" class="motion-list"></div>
 </section>
 
-<script type="module" src="{{ '/app.js?v=2' | url }}"></script>
+<section class="admin-panel" aria-labelledby="admin-heading">
+  <div class="section-heading">
+    <h2 id="admin-heading">Admin</h2>
+    <button id="admin-auth" class="secondary-button" type="button">Sign in with GitHub</button>
+  </div>
+  <p id="admin-status" class="status" role="status" aria-live="polite"></p>
+  <div id="admin-motions" class="admin-motion-list" hidden></div>
+</section>
+
+<script type="module" src="{{ '/app.js?v=3' | url }}"></script>

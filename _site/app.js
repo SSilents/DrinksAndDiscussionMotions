@@ -9,6 +9,9 @@ const formStatus = document.querySelector("#form-status");
 const motionsList = document.querySelector("#motions-list");
 const motionsStatus = document.querySelector("#motions-status");
 const refreshButton = document.querySelector("#refresh-motions");
+const adminAuthButton = document.querySelector("#admin-auth");
+const adminStatus = document.querySelector("#admin-status");
+const adminMotions = document.querySelector("#admin-motions");
 
 const escapeHtml = (value) => {
   const element = document.createElement("div");
@@ -88,6 +91,79 @@ async function loadMotions() {
   setStatus(motionsStatus, `${motions.length} motion${motions.length === 1 ? "" : "s"}`);
 }
 
+async function loadAdminPanel() {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) return;
+
+  const { data: admin, error: adminError } = await supabase
+    .from("admin_users")
+    .select("user_id")
+    .eq("user_id", session.user.id)
+    .maybeSingle();
+
+  if (adminError) {
+    setStatus(adminStatus, `Could not check admin access: ${adminError.message}`, true);
+    return;
+  }
+
+  adminAuthButton.textContent = "Sign out";
+  if (!admin) {
+    setStatus(adminStatus, "Signed in, but this account is not an administrator.");
+    return;
+  }
+
+  setStatus(adminStatus, "Administrator access enabled.");
+  adminMotions.hidden = false;
+  const { data: motions, error } = await supabase
+    .from("motions")
+    .select("id, title, proposer, created_at")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    setStatus(adminStatus, `Could not load admin controls: ${error.message}`, true);
+    return;
+  }
+
+  adminMotions.innerHTML = motions.map((item) => `
+    <div class="admin-motion-row">
+      <span>${escapeHtml(item.title)} — ${escapeHtml(item.proposer)}</span>
+      <button class="delete-button" type="button" data-delete-motion="${item.id}">Delete</button>
+    </div>
+  `).join("");
+}
+
+adminAuthButton.addEventListener("click", async () => {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (session) {
+    await supabase.auth.signOut();
+    adminMotions.hidden = true;
+    adminMotions.replaceChildren();
+    adminAuthButton.textContent = "Sign in with GitHub";
+    setStatus(adminStatus, "Signed out.");
+    return;
+  }
+
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: "github",
+    options: { redirectTo: window.location.href },
+  });
+  if (error) setStatus(adminStatus, `Could not start GitHub sign-in: ${error.message}`, true);
+});
+
+adminMotions.addEventListener("click", async (event) => {
+  const button = event.target.closest("[data-delete-motion]");
+  if (!button || !window.confirm("Delete this motion? This cannot be undone.")) return;
+  button.disabled = true;
+  const { error } = await supabase.from("motions").delete().eq("id", button.dataset.deleteMotion);
+  if (error) {
+    setStatus(adminStatus, `Could not delete motion: ${error.message}`, true);
+    button.disabled = false;
+    return;
+  }
+  await loadMotions();
+  await loadAdminPanel();
+});
+
 motionForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   const submitButton = motionForm.querySelector("button[type=submit]");
@@ -143,4 +219,6 @@ motionsList.addEventListener("click", async (event) => {
 });
 
 refreshButton.addEventListener("click", loadMotions);
+supabase.auth.onAuthStateChange(() => loadAdminPanel());
 loadMotions();
+loadAdminPanel();
