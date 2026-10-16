@@ -1,22 +1,40 @@
 ---
-title: Home
+title: Drinks and Discussion Motions
 layout: layouts/base.njk
 ---
 
-<section class="about-panel">
-  <h2>About Me</h2>
-  <p>Hello! My name is Louis Appleyard, a Durham University student studying Computer Science with a passion for ethics based design, environmentalism and leftist politics.</p>
+<section class="intro-panel">
+  <h2>Drinks and Discussion Motions</h2>
+  <p>Submit a motion, read what others have proposed, and vote for or against the ideas you want to discuss.</p>
 </section>
 
-<section class="posts-panel">
-<h2>Latest Posts</h2>
+<section class="motion-form-panel" aria-labelledby="submit-heading">
+  <h2 id="submit-heading">Submit a motion</h2>
+  <form id="motion-form">
+    <label for="motion-title">Title</label>
+    <input id="motion-title" name="title" type="text" maxlength="120" required>
 
-<ul class="post-list">
-  {% for post in collections.blog | reverse %}
-    <li class="post-item">
-      <a class="post-link" href="{{ post.url | url }}">{{ post.data.title }}</a><br>
-      <small class="post-date">{{ post.date | readableDate }}</small>
-    </li>
-  {% endfor %}
-</ul>
+    <label for="motion-proposer">Your name</label>
+    <input id="motion-proposer" name="proposer" type="text" maxlength="80" required>
+
+    <label for="motion-text">Motion</label>
+    <textarea id="motion-text" name="motion" rows="4" maxlength="2000" required></textarea>
+
+    <label for="motion-supporting-argument">Supporting argument <span>(optional)</span></label>
+    <textarea id="motion-supporting-argument" name="supporting_argument" rows="3" maxlength="3000"></textarea>
+
+    <button type="submit">Publish motion</button>
+    <p id="form-status" class="status" role="status" aria-live="polite"></p>
+  </form>
 </section>
+
+<section class="motions-panel" aria-labelledby="motions-heading">
+  <div class="section-heading">
+    <h2 id="motions-heading">Community motions</h2>
+    <button id="refresh-motions" class="secondary-button" type="button">Refresh</button>
+  </div>
+  <p id="motions-status" class="status" role="status" aria-live="polite">Loading motions...</p>
+  <div id="motions-list" class="motion-list"></div>
+</section>
+
+<script type="module" src="{{ '/app.js' | url }}"></script>

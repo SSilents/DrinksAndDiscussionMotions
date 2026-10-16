@@ -13,6 +13,7 @@ module.exports = function (eleventyConfig) {
   eleventyConfig.on("eleventy.beforeWatch", cleanOutput);
 
   eleventyConfig.addPassthroughCopy("style.css");
+  eleventyConfig.addPassthroughCopy("app.js");
 
   eleventyConfig.addFilter("readableDate", (dateObj) => {
     return new Intl.DateTimeFormat("en-CA", {
