@@ -127,6 +127,12 @@ textarea {
   background: #fff;
 }
 
+input:disabled {
+  color: var(--ink-muted);
+  background: #e7e9e2;
+  cursor: not-allowed;
+}
+
 input:focus,
 textarea:focus,
 button:focus-visible {

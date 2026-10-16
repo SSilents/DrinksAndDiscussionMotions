@@ -12,6 +12,8 @@ const refreshButton = document.querySelector("#refresh-motions");
 const adminAuthButton = document.querySelector("#admin-auth");
 const adminStatus = document.querySelector("#admin-status");
 const adminMotions = document.querySelector("#admin-motions");
+const proposerInput = document.querySelector("#motion-proposer");
+const anonymousInput = document.querySelector("#motion-anonymous");
 
 const escapeHtml = (value) => {
   const element = document.createElement("div");
@@ -27,6 +29,12 @@ const setStatus = (element, message, isError = false) => {
   element.textContent = message;
   element.classList.toggle("error", isError);
 };
+
+function updateAnonymousField() {
+  proposerInput.disabled = anonymousInput.checked;
+  proposerInput.placeholder = anonymousInput.checked ? "Displayed as Anonymous" : "";
+  if (anonymousInput.checked) proposerInput.value = "";
+}
 
 async function ensureAnonymousSession() {
   const { data: { session }, error: sessionError } = await supabase.auth.getSession();
@@ -219,6 +227,8 @@ motionsList.addEventListener("click", async (event) => {
 });
 
 refreshButton.addEventListener("click", loadMotions);
+anonymousInput.addEventListener("change", updateAnonymousField);
 supabase.auth.onAuthStateChange(() => loadAdminPanel());
+updateAnonymousField();
 loadMotions();
 loadAdminPanel();
