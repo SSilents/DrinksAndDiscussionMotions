@@ -1,13 +1,13 @@
 :root {
-  --bg-page: #f4f0f8;
-  --bg-card: #fbf8ff;
-  --bg-header: #e8dcf4;
-  --ink: #272134;
-  --ink-muted: #5f5870;
-  --accent: #b686d9;
-  --accent-strong: #8e5eb9;
-  --border: #cdbdde;
-  --shadow: #9e8ab8;
+  --bg-page: #eef4e7;
+  --bg-card: #fffdf4;
+  --bg-header: #d9e8bd;
+  --ink: #173b2f;
+  --ink-muted: #4f6659;
+  --accent: #a8c832;
+  --accent-strong: #176b45;
+  --border: #a7c28b;
+  --shadow: #6f9d5b;
   --max-width: 760px;
 }
 
@@ -20,7 +20,7 @@ body.site-body {
   color: var(--ink);
   font-family: Verdana, Tahoma, Arial, sans-serif;
   line-height: 1.6;
-  background: linear-gradient(180deg, #f7f3fb 0%, #f0e8f8 100%);
+  background: linear-gradient(180deg, #f5f8ed 0%, #e4efda 100%);
   overflow-wrap: break-word;
 }
 
@@ -35,7 +35,7 @@ body.site-body {
 .site-header {
   padding: 1rem 1.2rem;
   border-bottom: 2px solid var(--border);
-  background: linear-gradient(180deg, #f4ecfb 0%, var(--bg-header) 100%);
+  background: linear-gradient(180deg, #edf5d9 0%, var(--bg-header) 100%);
 }
 
 .site-title {
@@ -53,7 +53,7 @@ body.site-body {
 
 .site-title a:hover,
 .site-title a:focus-visible {
-  color: #71459a;
+  color: #0d4c31;
   text-decoration: underline;
   text-decoration-thickness: 2px;
   text-underline-offset: 2px;
@@ -115,7 +115,7 @@ textarea {
 input:focus,
 textarea:focus,
 button:focus-visible {
-  outline: 3px solid #d8b9f1;
+  outline: 3px solid #d5e88a;
   outline-offset: 2px;
 }
 
@@ -135,7 +135,7 @@ button {
 }
 
 button:hover:not(:disabled) {
-  background: #71459a;
+  background: #0d4c31;
 }
 
 button:disabled {
@@ -181,7 +181,7 @@ button:disabled {
 .motion-card {
   padding: 0.7rem 0.8rem;
   border: 1px solid var(--border);
-  background: linear-gradient(180deg, #fdfbff 0%, #f5eefc 100%);
+  background: linear-gradient(180deg, #fffef8 0%, #f0f6df 100%);
 }
 
 .motion-card h3 {
