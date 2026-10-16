@@ -182,16 +182,16 @@ motionForm.addEventListener("submit", async (event) => {
     const session = await ensureAnonymousSession();
     const formData = new FormData(motionForm);
     const isAnonymous = formData.get("anonymous") === "on";
-    const proposer = formData.get("proposer").trim();
+    const proposer = String(formData.get("proposer") ?? "").trim();
     if (!isAnonymous && !proposer) {
       throw new Error("Enter your name or choose Submit anonymously.");
     }
     const { error } = await supabase.from("motions").insert({
       author_id: session.user.id,
-      title: formData.get("title").trim(),
+      title: String(formData.get("title") ?? "").trim(),
       proposer: isAnonymous ? "Anonymous" : proposer,
       is_anonymous: isAnonymous,
-      supporting_argument: formData.get("supporting_argument").trim(),
+      supporting_argument: String(formData.get("supporting_argument") ?? "").trim(),
     });
     if (error) throw error;
     motionForm.reset();
