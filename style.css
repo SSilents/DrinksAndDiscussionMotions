@@ -97,9 +97,10 @@ label {
 }
 
 .checkbox-label {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 0.45rem;
+  white-space: nowrap;
   font-weight: normal;
 }
 
