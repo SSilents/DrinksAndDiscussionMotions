@@ -14,6 +14,7 @@ module.exports = function (eleventyConfig) {
 
   eleventyConfig.addPassthroughCopy("style.css");
   eleventyConfig.addPassthroughCopy("app.js");
+  eleventyConfig.addPassthroughCopy("images");
 
   eleventyConfig.addFilter("readableDate", (dateObj) => {
     return new Intl.DateTimeFormat("en-CA", {
