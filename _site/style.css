@@ -247,6 +247,23 @@ button:disabled {
   color: var(--ink);
 }
 
+.interest-button {
+  margin-top: 0.7rem;
+  color: var(--accent-strong);
+  background: #edf5d9;
+}
+
+.interest-button.is-interested {
+  color: #fff;
+  background: var(--accent-strong);
+}
+
+.interest-button span {
+  display: inline-block;
+  min-width: 1.2rem;
+  margin-left: 0.25rem;
+}
+
 .admin-motion-list {
   display: grid;
   gap: 0.5rem;

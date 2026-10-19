@@ -75,15 +75,37 @@ async function loadMotions() {
     return;
   }
 
+  const { data: { session } } = await supabase.auth.getSession();
+  const { data: interests, error: interestsError } = await supabase
+    .from("motion_interests")
+    .select("motion_id, user_id")
+    .in("motion_id", motionIds);
+
+  if (interestsError) {
+    setStatus(motionsStatus, `Could not load debate interest: ${interestsError.message}`, true);
+    return;
+  }
+
   const counts = reactions.reduce((result, reaction) => {
     const current = result[reaction.motion_id] ?? { up: 0, down: 0 };
     current[reaction.vote === 1 ? "up" : "down"] += 1;
     result[reaction.motion_id] = current;
     return result;
   }, {});
+  const interestCounts = interests.reduce((result, interest) => {
+    result[interest.motion_id] = (result[interest.motion_id] ?? 0) + 1;
+    return result;
+  }, {});
+  const interestedMotionIds = new Set(
+    interests
+      .filter(({ user_id }) => user_id === session?.user?.id)
+      .map(({ motion_id }) => String(motion_id)),
+  );
 
   motionsList.innerHTML = motions.map((item) => {
     const count = counts[item.id] ?? { up: 0, down: 0 };
+    const interestCount = interestCounts[item.id] ?? 0;
+    const isInterested = interestedMotionIds.has(String(item.id));
     return `
       <article class="motion-card">
         <h3>${escapeHtml(item.title)}</h3>
@@ -93,6 +115,9 @@ async function loadMotions() {
           <button class="reaction-button" type="button" data-vote="1" aria-label="Vote for ${escapeHtml(item.title)}">For <span>${count.up}</span></button>
           <button class="reaction-button" type="button" data-vote="-1" aria-label="Vote against ${escapeHtml(item.title)}">Against <span>${count.down}</span></button>
         </div>
+        <button class="interest-button${isInterested ? " is-interested" : ""}" type="button" data-interest-motion="${item.id}" aria-pressed="${isInterested}">
+          ${isInterested ? "Interested in debating this" : "I'm interested in debating this"} <span>${interestCount}</span>
+        </button>
       </article>
     `;
   }).join("");
@@ -206,23 +231,44 @@ motionForm.addEventListener("submit", async (event) => {
 
 motionsList.addEventListener("click", async (event) => {
   const button = event.target.closest("[data-vote]");
-  if (!button) return;
-  button.disabled = true;
+  const interestButton = event.target.closest("[data-interest-motion]");
+  if (!button && !interestButton) return;
+  const clickedButton = button ?? interestButton;
+  clickedButton.disabled = true;
 
   try {
     const session = await ensureAnonymousSession();
-    const motionId = button.closest("[data-motion-id]").dataset.motionId;
-    const { error } = await supabase.from("motion_reactions").upsert({
-      motion_id: motionId,
-      user_id: session.user.id,
-      vote: Number(button.dataset.vote),
-    }, { onConflict: "motion_id,user_id" });
+    const motionId = button
+      ? button.closest("[data-motion-id]").dataset.motionId
+      : interestButton.dataset.interestMotion;
+    let error;
+    if (button) {
+      ({ error } = await supabase.from("motion_reactions").upsert({
+        motion_id: motionId,
+        user_id: session.user.id,
+        vote: Number(button.dataset.vote),
+      }, { onConflict: "motion_id,user_id" }));
+    } else {
+      const isInterested = interestButton.getAttribute("aria-pressed") === "true";
+      if (isInterested) {
+        ({ error } = await supabase
+          .from("motion_interests")
+          .delete()
+          .eq("motion_id", motionId)
+          .eq("user_id", session.user.id));
+      } else {
+        ({ error } = await supabase.from("motion_interests").insert({
+          motion_id: motionId,
+          user_id: session.user.id,
+        }));
+      }
+    }
     if (error) throw error;
     await loadMotions();
   } catch (error) {
-    setStatus(motionsStatus, `Could not save reaction: ${error.message}`, true);
+    setStatus(motionsStatus, `Could not save response: ${error.message}`, true);
   } finally {
-    button.disabled = false;
+    clickedButton.disabled = false;
   }
 });
 

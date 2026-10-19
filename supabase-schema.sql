@@ -16,12 +16,20 @@ create table public.motion_reactions (
   primary key (motion_id, user_id)
 );
 
+create table public.motion_interests (
+  motion_id bigint not null references public.motions(id) on delete cascade,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  created_at timestamptz not null default now(),
+  primary key (motion_id, user_id)
+);
+
 create table public.admin_users (
   user_id uuid primary key references auth.users(id) on delete cascade
 );
 
 alter table public.motions enable row level security;
 alter table public.motion_reactions enable row level security;
+alter table public.motion_interests enable row level security;
 alter table public.admin_users enable row level security;
 
 create policy "Anyone can read motions"
@@ -49,6 +57,21 @@ create policy "Users can change their own reactions"
   to authenticated
   using (auth.uid() = user_id)
   with check (auth.uid() = user_id);
+
+create policy "Anyone can read debate interest"
+  on public.motion_interests for select
+  to anon, authenticated
+  using (true);
+
+create policy "Users can add debate interest"
+  on public.motion_interests for insert
+  to authenticated
+  with check (auth.uid() = user_id);
+
+create policy "Users can remove their debate interest"
+  on public.motion_interests for delete
+  to authenticated
+  using (auth.uid() = user_id);
 
 create policy "Admins can read admin membership"
   on public.admin_users for select
