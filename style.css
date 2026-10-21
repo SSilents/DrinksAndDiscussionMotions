@@ -334,4 +334,12 @@ button:disabled {
     width: 100%;
     flex-wrap: wrap;
   }
+
+  .motion-list {
+    margin-inline: 0.35rem;
+  }
+
+  .motion-card {
+    min-width: 0;
+  }
 }
