@@ -177,6 +177,26 @@ button:disabled {
   gap: 1rem;
 }
 
+.motion-list-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.motion-list-controls label {
+  margin-top: 0;
+  font-weight: normal;
+}
+
+.motion-list-controls select {
+  margin: 0;
+  padding: 0.35rem;
+  border: 1px solid var(--border);
+  color: var(--ink);
+  font: inherit;
+  background: #fff;
+}
+
 .section-heading h2 {
   margin-bottom: 0;
 }
@@ -303,5 +323,15 @@ button:disabled {
   .site-header,
   .site-main {
     padding: 0.9rem;
+  }
+
+  .section-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .motion-list-controls {
+    width: 100%;
+    flex-wrap: wrap;
   }
 }

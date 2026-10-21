@@ -8,6 +8,7 @@ const motionForm = document.querySelector("#motion-form");
 const formStatus = document.querySelector("#form-status");
 const motionsList = document.querySelector("#motions-list");
 const motionsStatus = document.querySelector("#motions-status");
+const motionSort = document.querySelector("#motion-sort");
 const refreshButton = document.querySelector("#refresh-motions");
 const adminAuthButton = document.querySelector("#admin-auth");
 const adminStatus = document.querySelector("#admin-status");
@@ -102,7 +103,20 @@ async function loadMotions() {
       .map(({ motion_id }) => String(motion_id)),
   );
 
-  motionsList.innerHTML = motions.map((item) => {
+  const sortOrder = motionSort.value;
+  const sortedMotions = [...motions].sort((first, second) => {
+    if (sortOrder === "newest") return 0;
+
+    const firstCount = sortOrder === "interest"
+      ? interestCounts[first.id] ?? 0
+      : counts[first.id]?.[sortOrder === "for" ? "up" : "down"] ?? 0;
+    const secondCount = sortOrder === "interest"
+      ? interestCounts[second.id] ?? 0
+      : counts[second.id]?.[sortOrder === "for" ? "up" : "down"] ?? 0;
+    return secondCount - firstCount;
+  });
+
+  motionsList.innerHTML = sortedMotions.map((item) => {
     const count = counts[item.id] ?? { up: 0, down: 0 };
     const interestCount = interestCounts[item.id] ?? 0;
     const isInterested = interestedMotionIds.has(String(item.id));
@@ -273,6 +287,7 @@ motionsList.addEventListener("click", async (event) => {
 });
 
 refreshButton.addEventListener("click", loadMotions);
+motionSort.addEventListener("change", loadMotions);
 anonymousInput.addEventListener("change", updateAnonymousField);
 supabase.auth.onAuthStateChange(() => loadAdminPanel());
 updateAnonymousField();

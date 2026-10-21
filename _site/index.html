@@ -47,7 +47,16 @@
 <section class="motions-panel" aria-labelledby="motions-heading">
   <div class="section-heading">
     <h2 id="motions-heading">Community motions</h2>
-    <button id="refresh-motions" class="secondary-button" type="button">Refresh</button>
+    <div class="motion-list-controls">
+      <label for="motion-sort">Order by</label>
+      <select id="motion-sort">
+        <option value="newest">Newest</option>
+        <option value="interest">Most want to discuss</option>
+        <option value="for">Most fors</option>
+        <option value="against">Most againsts</option>
+      </select>
+      <button id="refresh-motions" class="secondary-button" type="button">Refresh</button>
+    </div>
   </div>
   <p id="motions-status" class="status" role="status" aria-live="polite">Loading motions...</p>
   <div id="motions-list" class="motion-list"></div>
